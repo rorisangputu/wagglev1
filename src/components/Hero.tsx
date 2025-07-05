@@ -1,9 +1,10 @@
 import Image from "next/image";
 import dogHero from "../../public/dogwalko.png"; // Replace with your image
+import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="w-full bg-white py-16 px-6">
+    <section className="w-full bg-white py-16 px-6 ">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
         {/* Text Section */}
         <div className="text-center md:text-left flex-1">
@@ -13,9 +14,11 @@ export default function Hero() {
           <p className="text-base sm:text-lg text-gray-700 mb-6">
             Waggle helps busy pet parents keep tails wagging.
           </p>
-          <button className="px-6 py-3 bg-green-600 text-white rounded-full font-semibold hover:bg-green-700 transition">
-            Book a Walk
-          </button>
+          <Link href="/book">
+            <button className="px-6 py-3 bg-green-600 text-white rounded-full text-lg font-semibold hover:bg-green-700 transition">
+              Book a Walk
+            </button>
+          </Link>
         </div>
 
         {/* Image Section */}
