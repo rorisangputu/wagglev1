@@ -1,3 +1,4 @@
+import Footer from "@/components/Footer";
 import { HeadLink, Nav, NavLink } from "@/components/Nav";
 import { AlignJustify } from "lucide-react";
 
@@ -27,7 +28,10 @@ export default function ClientLayout({
           <AlignJustify className="text-black lg:hidden" />
         </div>
       </Nav>
-      <div className="w-[90%] xl:w-[70%] mx-auto my-6">{children}</div>
+      <div className="w-[90%] xl:w-[70%] mx-auto my-6 min-h-screen">
+        {children}
+      </div>
+      <Footer />
     </>
   );
 }
