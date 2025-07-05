@@ -7,8 +7,8 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
         {/* Text Section */}
         <div className="text-center md:text-left flex-1">
-          <h1 className="text-5xl sm:text-5xl xl:text-6xl max-w-[80%] sm:max-w-max mx-auto font-bold text-green-700 mb-4">
-            Life's Busy. We'll Handle the Walks.
+          <h1 className="text-5xl sm:text-5xl xl:text-6xl  mx-auto font-bold text-green-700 mb-4">
+            Life&apos;s Busy. We&apos;ll Handle the Walks.
           </h1>
           <p className="text-base sm:text-lg text-gray-700 mb-6">
             Waggle helps busy pet parents keep tails wagging.
