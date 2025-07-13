@@ -23,8 +23,8 @@ const NavBar = () => {
         {/* Desktop menu */}
         <div className="hidden lg:flex space-x-2">
           <NavLink href={"/"}>Home</NavLink>
-          <NavLink href={"/products"}>Products</NavLink>
-          <NavLink href={"/orders"}>My Orders</NavLink>
+          <NavLink href={"/book"}>Book A Walk</NavLink>
+          <NavLink href={"/walks"}>My Walks</NavLink>
         </div>
 
         {/* Mobile menu button */}
@@ -47,17 +47,20 @@ const NavBar = () => {
             <NavLink href={"/"} onClick={toggleMenu}>
               Home
             </NavLink>
-            <NavLink href={"/products"} onClick={toggleMenu}>
-              Products
+            <NavLink href={"/book"} onClick={toggleMenu}>
+              Book A Walk
             </NavLink>
-            <NavLink href={"/orders"} onClick={toggleMenu}>
-              My Orders
+            <NavLink href={"/walks"} onClick={toggleMenu}>
+              My Walks
             </NavLink>
-            <NavLink href={"/sign-up"} onClick={toggleMenu}>
+            <NavLink href={"/contact-us"} onClick={toggleMenu}>
               Contact Us
             </NavLink>
-            <NavLink href={"/sign-up"} onClick={toggleMenu}>
+            <NavLink href={"/sign-in"} onClick={toggleMenu}>
               Login
+            </NavLink>
+            <NavLink href={"/sign-up"} onClick={toggleMenu}>
+              Sign Up
             </NavLink>
           </div>
         </div>
