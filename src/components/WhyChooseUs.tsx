@@ -1,7 +1,7 @@
 // components/WhyChooseUs.tsx
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
-import pitbull from "../../public/pitbull.png";
+import pitbull from "../../public/Dog walking-bro.png";
 
 export default function WhyChooseUs() {
   return (
