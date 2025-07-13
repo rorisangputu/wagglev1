@@ -1,7 +1,7 @@
 import Image from "next/image";
 import workingDog from "../../public/workingDog.png";
-import walker from "../../public/youngwalker.png";
-import track from "../../public/doggo-track.png";
+import walker from "../../public/Dog walking-rafiki.png";
+import track from "../../public/Cautious dog-bro.png";
 import returnHome from "../../public/return.png";
 
 export default function HowItWorks() {
