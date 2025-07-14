@@ -39,7 +39,9 @@ export default function SignUpPage() {
         });
 
         if (res.ok) {
-          router.push("/login");
+          router.push(
+            `/verify?email=${encodeURIComponent(data.email as string)}`
+          );
         } else {
           const errorData = await res.json();
           setError(errorData.message || "Something went wrong");
