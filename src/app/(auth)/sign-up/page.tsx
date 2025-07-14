@@ -39,7 +39,7 @@ export default function SignUpPage() {
         });
 
         if (res.ok) {
-          router.push("/sign-in");
+          router.push("/login");
         } else {
           const errorData = await res.json();
           setError(errorData.message || "Something went wrong");

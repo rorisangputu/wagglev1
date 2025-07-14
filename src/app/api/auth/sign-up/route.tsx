@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import db from "@/db/db";
+import { addMinutes } from "date-fns";
 
 export async function POST(req: Request) {
   try {
@@ -27,13 +28,24 @@ export async function POST(req: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await db.user.create({
+    const user = await db.user.create({
       data: {
         name,
         email,
         phone,
         address,
         password: hashedPassword,
+        emailVerified: null,
+      },
+    });
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await db.verificationToken.create({
+      data: {
+        identifier: user.email,
+        token: code,
+        expires: addMinutes(new Date(), 15),
       },
     });
 
