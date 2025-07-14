@@ -14,40 +14,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Product {
-  id           String   @id @default(uuid())
+model Walk {
+  id           String    @id @default(uuid())
   name         String
   priceInCents Int
   imageUrl     String
   description  String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  orders       Order[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  booking      Booking[]
 }
 
-model Order {
+model Booking {
   id               String   @id @default(uuid())
   pricePaidInCents Int
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   userId           String
-  productId        String
+  walkId           String
   refNumber        String   @unique
   status           String   @default("pending")
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Product          Product  @relation(fields: [productId], references: [id])
+  Walk             Walk     @relation(fields: [walkId], references: [id])
 }
 
 model User {
   id            String    @id @default(uuid())
   name          String?
   email         String    @unique
+  password      String
+  phone         String?
+  address       String?
   emailVerified DateTime?
   image         String?
-  password      String? // For credentials provider
   accounts      Account[]
   sessions      Session[]
-  orders        Order[]
+  bookings      Booking[]
+  updatedAt     DateTime  @updatedAt
 }
 
 model Session {
