@@ -12,9 +12,7 @@ export default function ClientLayout({
   return (
     <>
       <NavBar />
-      <div className="w-[90%] xl:w-[70%] mx-auto my-6 min-h-screen">
-        {children}
-      </div>
+      <div className="w-[90%] xl:w-[70%] mx-auto my-6 flex-1">{children}</div>
       <Footer />
     </>
   );
