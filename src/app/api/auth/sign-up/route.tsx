@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import db from "@/db/db";
 import { addMinutes } from "date-fns";
+import { signUpSchema } from "@/lib/validationSchemas";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, email, phone, address, password } = body;
+    const { name, email, phone, address, password } = signUpSchema.parse(body);
 
     if (!name || !email || !password || !phone || !address) {
       return NextResponse.json(
