@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import walk from "../../../../../public/Dog walking-rafiki.png";
 import { Input } from "@/components/ui/input";
@@ -42,31 +41,58 @@ const timeOptions = [
 
 export default function BookingPageClient() {
   const [showForm, setShowForm] = useState(false);
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    dogName: string;
+    address: string;
+    date: Date | undefined;
+    time: string;
+    notes: string;
+  }>({
     name: "",
     dogName: "",
     address: "",
-    date: date,
+    date: undefined,
     time: "",
     notes: "",
   });
 
-  const handleChange = (e: any) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      date: new Date(),
+    }));
+  }, []);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleTimeChange = (value: string) => {
-    setFormData({ ...formData, time: value });
+    setFormData((prev) => ({
+      ...prev,
+      time: value,
+    }));
   };
 
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    console.log({
-      ...formData,
+  const handleDateChange = (date: Date | undefined) => {
+    setFormData((prev) => ({
+      ...prev,
       date,
-    });
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log(formData);
     alert("Booking submitted!");
+    // Later: send `formData` to your API route
   };
 
   return (
@@ -74,18 +100,22 @@ export default function BookingPageClient() {
       <h1 className="text-gray-500 font-bold text-center text-2xl">
         Book a walk
       </h1>
+
       <div className="flex justify-center">
         <Image
           src={walk}
           alt="Dog walking illustration"
           className="w-64 h-auto"
+          priority
         />
       </div>
+
       <div className="space-y-5">
         <div className="flex justify-between items-end">
           <h2 className="text-green-600 text-4xl font-bold">R 250.00</h2>
           <p className="text-gray-400">per walk</p>
         </div>
+
         <div className="space-y-3">
           <h3 className="font-semibold text-xl text-gray-500">Details</h3>
           <p className="text-gray-700">
@@ -98,16 +128,14 @@ export default function BookingPageClient() {
           </p>
         </div>
 
-        {!showForm && (
+        {!showForm ? (
           <button
             onClick={() => setShowForm(true)}
-            className="bg-green-600  text-white px-4 py-2 rounded-lg w-full hover:bg-green-700 transition"
+            className="bg-green-600 text-white px-4 py-2 rounded-lg w-full hover:bg-green-700 transition"
           >
             Book Now
           </button>
-        )}
-
-        {showForm && (
+        ) : (
           <div className="space-y-3">
             <p className="text-xl font-bold text-gray-600">Booking Form</p>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -138,8 +166,8 @@ export default function BookingPageClient() {
 
               <Calendar
                 mode="single"
-                selected={date}
-                onSelect={setDate}
+                selected={formData.date}
+                onSelect={handleDateChange}
                 className="rounded-lg border"
               />
 

@@ -7,6 +7,6 @@ export default async function BookingPage() {
   if (!session) {
     redirect(`/login?redirectTo=/book`);
   }
-  console.log(session);
+  // console.log(session);
   return <BookingPageClient />;
 }
