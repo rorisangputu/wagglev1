@@ -1,10 +1,13 @@
 "use client";
+
 import React, { useState } from "react";
 import { HeadLink, Nav, NavLink } from "./Nav";
 import { AlignJustify, X } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
 
 const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { data: session, status } = useSession();
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
@@ -13,7 +16,21 @@ const NavBar = () => {
       {/* Top right links */}
       <div className="flex justify-end space-x-5">
         <HeadLink href={"/contact-us"}>Contact Us</HeadLink>
-        <HeadLink href={"/login"}>Login</HeadLink>
+
+        {status === "loading" ? null : session ? (
+          <>
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="text-sm text-blue-500 hover:underline"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <HeadLink href={"/login"}>Login</HeadLink>
+          </>
+        )}
       </div>
 
       {/* Main nav row */}
@@ -24,7 +41,7 @@ const NavBar = () => {
         <div className="hidden lg:flex space-x-2">
           <NavLink href={"/"}>Home</NavLink>
           <NavLink href={"/book"}>Book A Walk</NavLink>
-          <NavLink href={"/walks"}>My Walks</NavLink>
+          {session && <NavLink href={"/walks"}>My Walks</NavLink>}
         </div>
 
         {/* Mobile menu button */}
@@ -43,25 +60,46 @@ const NavBar = () => {
           <div>
             <h1 className="text-green-600 text-4xl py-6 font-bold">Waggle</h1>
           </div>
-          <div className="flex flex-col space-y-3 lg:hidden">
+          <div className="flex flex-col space-y-3">
             <NavLink href={"/"} onClick={toggleMenu}>
               Home
             </NavLink>
             <NavLink href={"/book"} onClick={toggleMenu}>
               Book A Walk
             </NavLink>
-            <NavLink href={"/walks"} onClick={toggleMenu}>
-              My Walks
-            </NavLink>
+            {session && (
+              <NavLink href={"/walks"} onClick={toggleMenu}>
+                My Walks
+              </NavLink>
+            )}
             <NavLink href={"/contact-us"} onClick={toggleMenu}>
               Contact Us
             </NavLink>
-            <NavLink href={"/sign-in"} onClick={toggleMenu}>
-              Login
-            </NavLink>
-            <NavLink href={"/sign-up"} onClick={toggleMenu}>
-              Sign Up
-            </NavLink>
+            {status === "loading" ? null : session ? (
+              <>
+                <NavLink href={"/account"} onClick={toggleMenu}>
+                  Account
+                </NavLink>
+                <button
+                  onClick={() => {
+                    signOut({ callbackUrl: "/" });
+                    toggleMenu();
+                  }}
+                  className="text-left text-sm text-blue-500 hover:underline"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <NavLink href={"/login"} onClick={toggleMenu}>
+                  Login
+                </NavLink>
+                <NavLink href={"/sign-up"} onClick={toggleMenu}>
+                  Sign Up
+                </NavLink>
+              </>
+            )}
           </div>
         </div>
       )}
