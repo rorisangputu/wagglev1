@@ -1,67 +1,45 @@
-import db from "@/db/db";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
-import { headers } from "next/headers";
-import { authLimiter } from "./rateLimiter";
+import db from "@/db/db";
 import { loginSchema } from "./validationSchemas";
 
-const adapter = PrismaAdapter(db);
-
-export const { auth, handlers, signIn } = NextAuth({
-  adapter: adapter,
+export const {
+  handlers: { GET, POST },
+  auth,
+  signIn,
+  signOut,
+} = NextAuth({
+  adapter: PrismaAdapter(db),
+  session: { strategy: "jwt" },
   providers: [
-    Credentials({
+    CredentialsProvider({
+      name: "Credentials",
       credentials: {
-        email: {},
-        password: {},
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
-        //Rate Limiter based on ip address
-        const ip = (await headers()).get("x-forwarded-for") ?? "anonymous";
+        const validated = loginSchema.parse(credentials);
 
-        const { success } = await authLimiter.limit(ip);
-        if (!success) {
-          throw new Error("Too many login attempts. Try again later.");
-        }
-
-        //Validating credentials from sign in form
-        const validatedCredentials = loginSchema.parse(credentials);
-
-        //Search for user in db using validted email
-        const user = await db.user.findFirst({
-          where: { email: validatedCredentials.email },
+        const user = await db.user.findUnique({
+          where: { email: validated.email },
         });
 
-        //Throw new error if user with email is not found
-        if (!user) {
-          throw new Error("Invalid credentials");
-        }
+        if (!user) throw new Error("Invalid credentials.");
 
-        //If user is present, compare password with hashed db password
         const isValid = await bcrypt.compare(
-          validatedCredentials.password,
+          validated.password,
           user.password as string
         );
-        if (!isValid) {
-          throw new Error("Invalid credentials");
-        }
+        if (!isValid) throw new Error("Invalid credentials.");
 
-        //Return user if credentials match
+        if (!user.emailVerified)
+          throw new Error("Please verify your email before logging in.");
+
         return user;
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, account }) {
-      if (account?.provider === "credentials") {
-        token.credentials = true;
-      }
-      return token;
-    },
-  },
-  session: {
-    strategy: "jwt",
-  },
 });
