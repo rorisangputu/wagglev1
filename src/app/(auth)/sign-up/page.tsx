@@ -81,7 +81,7 @@ export default function SignUpPage() {
         />
         <input
           name="phone"
-          type="tel"
+          type="text"
           placeholder="Phone Number"
           required
           className="w-full p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
