@@ -12,8 +12,8 @@ const NavBar = () => {
     <Nav>
       {/* Top right links */}
       <div className="flex justify-end space-x-5">
-        <HeadLink href={"/sign-up"}>Contact Us</HeadLink>
-        <HeadLink href={"/sign-up"}>Login</HeadLink>
+        <HeadLink href={"/contact-us"}>Contact Us</HeadLink>
+        <HeadLink href={"/login"}>Login</HeadLink>
       </div>
 
       {/* Main nav row */}

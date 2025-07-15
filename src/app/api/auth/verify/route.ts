@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
     // Find the verification token
     const tokenRecord = await db.verificationToken.findUnique({
-      where: { token: code },
+      where: { identifier: email },
     });
 
     if (!tokenRecord) {
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
     // Optionally, delete the verification token now that it is used
     await db.verificationToken.delete({
-      where: { token: code },
+      where: { identifier: email },
     });
 
     return NextResponse.json({ message: "Email verified successfully." });
