@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { booking } from "@/lib/validationSchemas";
-import z from "zod";
 
 const timeOptions = [
   "08:00 AM",
@@ -58,6 +57,7 @@ export default function BookingPageClient() {
     time: "",
     notes: "",
   });
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setFormData((prev) => ({
@@ -74,6 +74,7 @@ export default function BookingPageClient() {
       ...prev,
       [name]: value,
     }));
+    console.log(formData);
   };
 
   const handleTimeChange = (value: string) => {
@@ -95,9 +96,18 @@ export default function BookingPageClient() {
 
     const result = booking.safeParse(formData);
     if (!result.success) {
-      const treeified = z.treeifyError(result.error);
-      console.log(treeified);
-      alert("Please correct the errors in your form.");
+      const formattedErrors = result.error.format();
+      const errors: Record<string, string> = {};
+
+      for (const [field, value] of Object.entries(formattedErrors)) {
+        if (field === "_errors") continue; // skip general errors
+        if (value && "_errors" in value && value._errors.length > 0) {
+          errors[field] = value._errors[0];
+        }
+      }
+
+      setFormErrors(errors);
+      console.log(errors);
       return;
     }
     const validData = result.data;
@@ -158,6 +168,10 @@ export default function BookingPageClient() {
                 onChange={handleChange}
                 required
               />
+              {formErrors.name && (
+                <p className="text-red-500 text-sm">{formErrors.name}</p>
+              )}
+
               <Input
                 type="text"
                 name="dogName"
@@ -166,6 +180,10 @@ export default function BookingPageClient() {
                 onChange={handleChange}
                 required
               />
+              {formErrors.dogName && (
+                <p className="text-red-500 text-sm">{formErrors.dogName}</p>
+              )}
+
               <Input
                 type="text"
                 name="address"
@@ -174,6 +192,9 @@ export default function BookingPageClient() {
                 onChange={handleChange}
                 required
               />
+              {formErrors.address && (
+                <p className="text-red-500 text-sm">{formErrors.address}</p>
+              )}
 
               <Calendar
                 mode="single"
@@ -194,6 +215,9 @@ export default function BookingPageClient() {
                   ))}
                 </SelectContent>
               </Select>
+              {formErrors.time && (
+                <p className="text-red-500 text-sm">{formErrors.time}</p>
+              )}
 
               <Textarea
                 name="notes"
