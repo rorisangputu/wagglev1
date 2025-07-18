@@ -97,7 +97,17 @@ export default function BookingPageClient() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const result = bookingSchema.safeParse(formData);
+    if (!formData.date || isNaN(formData.date.getTime())) {
+      setFormErrors({ date: "Please select a valid date." });
+      return;
+    }
+
+    // Convert date to ISO string for consistent validation and server payload
+    const preparedData = {
+      ...formData,
+      date: formData.date.toISOString(),
+    };
+    const result = bookingSchema.safeParse(preparedData);
     if (!result.success) {
       const formattedErrors = result.error.format();
       const errors: Record<string, string> = {};
