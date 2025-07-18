@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import db from "@/db/db";
 import { bookingSchema } from "@/lib/validationSchemas";
 import { generateBookingRef, getCurrentUser } from "@/lib/actions";
+import { ZodError } from "zod";
 
 export async function POST(req: Request) {
   try {
-    const body = req.json();
+    const body = await req.json();
     const { dogName, address, date, notes, time } = bookingSchema.parse(body);
 
     const user = await getCurrentUser();
@@ -23,9 +24,16 @@ export async function POST(req: Request) {
         pricePaidInCents: 25000,
       },
     });
-    return NextResponse.json(booking, { status: 201 });
+
+    return NextResponse.json({ refNumber: booking.refNumber }, { status: 201 });
   } catch (error) {
     console.error(error);
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        { message: "Validation failed", errors: error.format() },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       { message: error instanceof Error ? error.message : "Internal error" },
       { status: 401 }
