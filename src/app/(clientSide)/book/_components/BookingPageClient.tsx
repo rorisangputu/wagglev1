@@ -110,6 +110,7 @@ export default function BookingPageClient() {
       console.log(errors);
       return;
     }
+    setFormErrors({});
     const validData = result.data;
     console.log("Booking validated:", validData);
     alert("Booking submitted!");
