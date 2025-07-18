@@ -37,7 +37,10 @@ export default function SignInPage() {
   return (
     <div className="flex justify-center items-center min-h-screen p-4">
       <div className="w-full max-w-sm bg-white rounded-xl shadow p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-center">Login</h1>
+        <h1 className="text-green-600 text-4xl font-bold text-center">
+          Waggle.
+        </h1>
+        <h1 className="text-2xl font-semibold text-center">Login</h1>
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
