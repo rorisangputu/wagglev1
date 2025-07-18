@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import Image from "next/image";
 import walk from "../../../../../public/Dog walking-rafiki.png";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { bookingSchema } from "@/lib/validationSchemas";
+import { useRouter } from "next/navigation";
 
 const timeOptions = [
   "08:00 AM",
@@ -41,6 +42,7 @@ const timeOptions = [
 ];
 
 export default function BookingPageClient() {
+  const router = useRouter();
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState<{
     name: string;
@@ -58,6 +60,7 @@ export default function BookingPageClient() {
     notes: "",
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     setFormData((prev) => ({
@@ -113,8 +116,32 @@ export default function BookingPageClient() {
     setFormErrors({});
     const validData = result.data;
     console.log("Booking validated:", validData);
-    alert("Booking submitted!");
-    // Later: send `formData` to your API route
+
+    startTransition(async () => {
+      const res = await fetch("/api/booking/create", {
+        method: "POST",
+        body: JSON.stringify(validData),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) {
+        alert("Failed to create booking");
+        return;
+      }
+
+      const { refNumber } = await res.json();
+
+      alert("Booking submitted!");
+      setFormData({
+        name: "",
+        dogName: "",
+        address: "",
+        date: new Date(),
+        time: "",
+        notes: "",
+      });
+      router.push(`/booking/${refNumber}`);
+    });
   };
 
   return (
@@ -191,9 +218,10 @@ export default function BookingPageClient() {
                 onSelect={handleDateChange}
                 className="rounded-lg border"
               />
-              {formErrors.time && (
+              {formErrors.date && (
                 <p className="text-red-500 text-sm">{formErrors.date}</p>
               )}
+
               <Select onValueChange={handleTimeChange} value={formData.time}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Preferred Time" />
@@ -219,9 +247,12 @@ export default function BookingPageClient() {
 
               <button
                 type="submit"
-                className="bg-green-600 text-white px-4 py-2 rounded-lg w-full hover:bg-green-700 transition"
+                disabled={isPending}
+                className={`${
+                  isPending ? "bg-gray-700" : "bg-green-600 hover:bg-green-700"
+                }  text-white px-4 py-2 rounded-lg w-full transition`}
               >
-                Confirm Booking
+                {isPending ? "Pending.." : "Confirm Booking"}
               </button>
             </form>
           </div>

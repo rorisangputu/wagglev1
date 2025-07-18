@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 export default async function BookingPage() {
   const session = await auth();
   if (!session) {
-    redirect(`/login?redirectTo=/book`);
+    redirect(`/login?redirectTo=/booking`);
   }
   // console.log(session);
   return <BookingPageClient />;
