@@ -14,28 +14,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Walk {
-  id           String    @id @default(uuid())
-  name         String
-  priceInCents Int
-  imageUrl     String
-  description  String
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  booking      Booking[]
-}
-
 model Booking {
   id               String   @id @default(uuid())
   pricePaidInCents Int
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   userId           String
-  walkId           String
   refNumber        String   @unique
   status           String   @default("pending")
+  
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Walk             Walk     @relation(fields: [walkId], references: [id])
 }
 
 model User {
