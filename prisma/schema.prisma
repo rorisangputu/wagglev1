@@ -22,7 +22,11 @@ model Booking {
   userId           String
   refNumber        String   @unique
   status           String   @default("pending")
-  
+  address          String
+  dogName          String
+  notes            String?
+  date             DateTime
+  time             String
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
