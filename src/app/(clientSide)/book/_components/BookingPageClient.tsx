@@ -12,6 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { booking } from "@/lib/validationSchemas";
+import z from "zod";
 
 const timeOptions = [
   "08:00 AM",
@@ -90,7 +92,16 @@ export default function BookingPageClient() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
+
+    const result = booking.safeParse(formData);
+    if (!result.success) {
+      const treeified = z.treeifyError(result.error);
+      console.log(treeified);
+      alert("Please correct the errors in your form.");
+      return;
+    }
+    const validData = result.data;
+    console.log("Booking validated:", validData);
     alert("Booking submitted!");
     // Later: send `formData` to your API route
   };
