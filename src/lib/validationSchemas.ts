@@ -19,10 +19,10 @@ const verifyCodeSchema = z.object({
   code: z.string().length(6),
 });
 
-const booking = z.object({
-  name: z.string().min(1, "Name is required"),
+const bookingSchema = z.object({
   dogName: z.string().min(2, "Dog's name must be at least 2 characters"),
   address: z.string().min(1, "Address is required"),
+  date: z.date(),
   time: z.string().min(1, "Time is required"),
   notes: z.string().optional(),
 });
@@ -32,4 +32,10 @@ const paymentSchema = z.object({
   email: z.email(),
 });
 
-export { signUpSchema, loginSchema, booking, paymentSchema, verifyCodeSchema };
+export {
+  signUpSchema,
+  loginSchema,
+  bookingSchema,
+  paymentSchema,
+  verifyCodeSchema,
+};
