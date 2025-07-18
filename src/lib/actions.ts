@@ -1,8 +1,15 @@
 import db from "@/db/db";
-import { User } from "@/generated/prisma";
+
 import { auth } from "@/lib/auth";
 
-export async function getCurrentUser(): Promise<User> {
+type CurrentUser = {
+  id: string;
+  email: string;
+  name: string | null;
+  address: string | null;
+};
+
+export async function getCurrentUser(): Promise<CurrentUser> {
   const userSession = await auth();
   if (!userSession?.user?.email) {
     throw new Error("Not authenticated");
@@ -10,6 +17,7 @@ export async function getCurrentUser(): Promise<User> {
 
   const user = await db.user.findUnique({
     where: { email: userSession.user.email },
+    select: { id: true, email: true, name: true, address: true },
   });
 
   if (!user) {
