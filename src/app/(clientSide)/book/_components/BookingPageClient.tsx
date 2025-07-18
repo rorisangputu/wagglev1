@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { booking } from "@/lib/validationSchemas";
+import { bookingSchema } from "@/lib/validationSchemas";
 
 const timeOptions = [
   "08:00 AM",
@@ -94,7 +94,7 @@ export default function BookingPageClient() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const result = booking.safeParse(formData);
+    const result = bookingSchema.safeParse(formData);
     if (!result.success) {
       const formattedErrors = result.error.format();
       const errors: Record<string, string> = {};
@@ -163,18 +163,6 @@ export default function BookingPageClient() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <Input
                 type="text"
-                name="name"
-                placeholder="Your Name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-              {formErrors.name && (
-                <p className="text-red-500 text-sm">{formErrors.name}</p>
-              )}
-
-              <Input
-                type="text"
                 name="dogName"
                 placeholder="Dog's Name"
                 value={formData.dogName}
@@ -203,7 +191,9 @@ export default function BookingPageClient() {
                 onSelect={handleDateChange}
                 className="rounded-lg border"
               />
-
+              {formErrors.time && (
+                <p className="text-red-500 text-sm">{formErrors.date}</p>
+              )}
               <Select onValueChange={handleTimeChange} value={formData.time}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Preferred Time" />
