@@ -22,7 +22,7 @@ const verifyCodeSchema = z.object({
 const bookingSchema = z.object({
   dogName: z.string().min(2, "Dog's name must be at least 2 characters"),
   address: z.string().min(1, "Address is required"),
-  date: z.date(),
+  date: z.iso.datetime({ offset: true }),
   time: z.string().min(1, "Time is required"),
   notes: z.string().optional(),
 });
