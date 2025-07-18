@@ -23,11 +23,6 @@ const booking = z.object({
   name: z.string().min(1, "Name is required"),
   dogName: z.string().min(2, "Dog's name must be at least 2 characters"),
   address: z.string().min(1, "Address is required"),
-  date: z
-    .date()
-    .refine((date) => date instanceof Date && !isNaN(date.getTime()), {
-      message: "Date is required",
-    }),
   time: z.string().min(1, "Time is required"),
   notes: z.string().optional(),
 });
