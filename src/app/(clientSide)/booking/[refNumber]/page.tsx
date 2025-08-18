@@ -23,7 +23,7 @@ export default async function ConfirmBookingPage({
     include: { user: true },
   });
 
-  const handlePayment = async (reference) => {};
+  const handlePayment = async () => {};
 
   if (!booking || booking.user.email !== session.user.email) {
     return (
@@ -73,7 +73,7 @@ export default async function ConfirmBookingPage({
         <div className="pt-4">
           {/* Replace with your Stripe Checkout or Payfast integration */}
           <button
-            onClick={handlePayment(refNumber)}
+            onClick={handlePayment}
             className="w-full bg-green-600 hover:bg-green-700 transition text-white font-semibold py-2 rounded-lg"
           >
             Proceed to Payment
