@@ -1,21 +1,32 @@
-// app/api/payfast/notify/route.ts
 import db from "@/db/db";
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 
-function buildQuery(data: Record<string, string>) {
-  return Object.entries(data)
-    .filter(([ value]) => value !== "" && value != null) // Remove empty values
-    .sort(([a], [b]) => a.localeCompare(b)) // Alphabetical order
-    .map(
-      ([key, value]) =>
-        `${key}=${encodeURIComponent(value.toString().trim()).replace(
+// Same signature function for ITN verification
+const generateSignature = (
+  data: Record<string, string>,
+  passPhrase: string | null = null
+) => {
+  let pfOutput = "";
+  for (const key in data) {
+    if (data.hasOwnProperty(key)) {
+      if (data[key] !== "") {
+        pfOutput += `${key}=${encodeURIComponent(data[key].trim()).replace(
           /%20/g,
           "+"
-        )}`
-    )
-    .join("&");
-}
+        )}&`;
+      }
+    }
+  }
+  let getString = pfOutput.slice(0, -1);
+  if (passPhrase !== null) {
+    getString += `&passphrase=${encodeURIComponent(passPhrase.trim()).replace(
+      /%20/g,
+      "+"
+    )}`;
+  }
+  return crypto.createHash("md5").update(getString).digest("hex");
+};
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,52 +44,46 @@ export async function POST(req: NextRequest) {
     const receivedSignature = data.signature;
     delete data.signature; // Remove signature from data for verification
 
-    // Build verification string
-    const verificationString =
-      buildQuery(data) +
-      (process.env.PAYFAST_PASSPHRASE
-        ? `&passphrase=${encodeURIComponent(process.env.PAYFAST_PASSPHRASE)}`
-        : "");
-
-    const computedSignature = crypto
-      .createHash("md5")
-      .update(verificationString)
-      .digest("hex");
+    // Generate signature for verification
+    const computedSignature = generateSignature(
+      data,
+      process.env.PAYFAST_PASSPHRASE || null
+    );
 
     if (receivedSignature !== computedSignature) {
       console.error("Signature mismatch:", {
         receivedSignature,
         computedSignature,
-        verificationString,
+        data,
       });
       return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }
 
     // Additional validations
-    const validIps = [
-      "197.97.145.144",
-      "197.97.145.145",
-      "197.97.145.146",
-      "197.97.145.147",
-      "197.97.145.148",
-      "41.74.179.194",
-      "41.74.179.195",
-      "41.74.179.196",
-      "41.74.179.197",
-      "41.74.179.198",
-      "41.74.179.199",
-    ];
+    // const validIps = [
+    //   "197.97.145.144",
+    //   "197.97.145.145",
+    //   "197.97.145.146",
+    //   "197.97.145.147",
+    //   "197.97.145.148",
+    //   "41.74.179.194",
+    //   "41.74.179.195",
+    //   "41.74.179.196",
+    //   "41.74.179.197",
+    //   "41.74.179.198",
+    //   "41.74.179.199",
+    // ];
 
-    const clientIp =
-      req.headers.get("x-forwarded-for")?.split(",")[0] ||
-      req.headers.get("x-real-ip") ||
-      "unknown";
+    // const clientIp =
+    //   req.headers.get("x-forwarded-for")?.split(",")[0] ||
+    //   req.headers.get("x-real-ip") ||
+    //   "unknown";
 
     // Skip IP validation in development
-    if (process.env.NODE_ENV === "production" && !validIps.includes(clientIp)) {
-      console.error("Invalid IP:", clientIp);
-      return NextResponse.json({ error: "Invalid IP" }, { status: 403 });
-    }
+    // if (process.env.NODE_ENV === "production" && !validIps.includes(clientIp)) {
+    //   console.error("Invalid IP:", clientIp);
+    //   return NextResponse.json({ error: "Invalid IP" }, { status: 403 });
+    // }
 
     // Validate merchant details
     if (
