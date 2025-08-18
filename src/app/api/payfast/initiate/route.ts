@@ -77,10 +77,7 @@ export async function POST(req: NextRequest) {
       .digest("hex");
 
     // Use www.payfast.co.za for production, sandbox.payfast.co.za for testing
-    const baseUrl =
-      process.env.NODE_ENV === "production"
-        ? "https://www.payfast.co.za"
-        : "https://sandbox.payfast.co.za";
+    const baseUrl = "https://sandbox.payfast.co.za";
 
     const checkoutUrl = `${baseUrl}/eng/process?${queryString}&signature=${signature}`;
 
