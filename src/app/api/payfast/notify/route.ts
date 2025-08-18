@@ -2,29 +2,59 @@ import db from "@/db/db";
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 
-// Same signature function for ITN verification
-const generateSignature = (
+// ITN signature verification - must use Payfast's parameter order
+const generateITNSignature = (
   data: Record<string, string>,
   passPhrase: string | null = null
 ) => {
+  // Payfast ITN parameter order (based on their documentation)
+  const paramOrder = [
+    "m_payment_id",
+    "pf_payment_id",
+    "payment_status",
+    "item_name",
+    "item_description",
+    "amount_gross",
+    "amount_fee",
+    "amount_net",
+    "custom_str1",
+    "custom_str2",
+    "custom_str3",
+    "custom_str4",
+    "custom_str5",
+    "custom_int1",
+    "custom_int2",
+    "custom_int3",
+    "custom_int4",
+    "custom_int5",
+    "name_first",
+    "name_last",
+    "email_address",
+    "merchant_id",
+  ];
+
   let pfOutput = "";
-  for (const key in data) {
-    if (data.hasOwnProperty(key)) {
-      if (data[key] !== "") {
-        pfOutput += `${key}=${encodeURIComponent(data[key].trim()).replace(
-          /%20/g,
-          "+"
-        )}&`;
-      }
+
+  // Process parameters in Payfast's expected order
+  paramOrder.forEach((key) => {
+    if (data.hasOwnProperty(key) && data[key] !== "") {
+      pfOutput += `${key}=${encodeURIComponent(data[key].trim()).replace(
+        /%20/g,
+        "+"
+      )}&`;
     }
-  }
+  });
+
+  // Remove last ampersand
   let getString = pfOutput.slice(0, -1);
-  if (passPhrase !== null) {
+
+  if (passPhrase !== null && passPhrase !== "") {
     getString += `&passphrase=${encodeURIComponent(passPhrase.trim()).replace(
       /%20/g,
       "+"
     )}`;
   }
+
   return crypto.createHash("md5").update(getString).digest("hex");
 };
 
@@ -44,11 +74,58 @@ export async function POST(req: NextRequest) {
     const receivedSignature = data.signature;
     delete data.signature; // Remove signature from data for verification
 
-    // Generate signature for verification
-    const computedSignature = generateSignature(
+    // Generate signature for verification using ITN-specific function
+    const computedSignature = generateITNSignature(
       data,
       process.env.PAYFAST_PASSPHRASE || null
     );
+
+    console.log("ITN Signature Debug:");
+    console.log("Received signature:", receivedSignature);
+    console.log("Computed signature:", computedSignature);
+
+    // Create verification string for debugging
+    const paramOrder = [
+      "m_payment_id",
+      "pf_payment_id",
+      "payment_status",
+      "item_name",
+      "item_description",
+      "amount_gross",
+      "amount_fee",
+      "amount_net",
+      "custom_str1",
+      "custom_str2",
+      "custom_str3",
+      "custom_str4",
+      "custom_str5",
+      "custom_int1",
+      "custom_int2",
+      "custom_int3",
+      "custom_int4",
+      "custom_int5",
+      "name_first",
+      "name_last",
+      "email_address",
+      "merchant_id",
+    ];
+
+    let debugString = "";
+    paramOrder.forEach((key) => {
+      if (data.hasOwnProperty(key) && data[key] !== "") {
+        debugString += `${key}=${encodeURIComponent(data[key].trim()).replace(
+          /%20/g,
+          "+"
+        )}&`;
+      }
+    });
+    debugString = debugString.slice(0, -1);
+    if (process.env.PAYFAST_PASSPHRASE) {
+      debugString += `&passphrase=${encodeURIComponent(
+        process.env.PAYFAST_PASSPHRASE.trim()
+      ).replace(/%20/g, "+")}`;
+    }
+    console.log("Verification string:", debugString);
 
     if (receivedSignature !== computedSignature) {
       console.error("Signature mismatch:", {
@@ -59,7 +136,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }
 
-    // Additional validations
+    // // Additional validations
     // const validIps = [
     //   "197.97.145.144",
     //   "197.97.145.145",
@@ -79,7 +156,7 @@ export async function POST(req: NextRequest) {
     //   req.headers.get("x-real-ip") ||
     //   "unknown";
 
-    // Skip IP validation in development
+    // // Skip IP validation in development
     // if (process.env.NODE_ENV === "production" && !validIps.includes(clientIp)) {
     //   console.error("Invalid IP:", clientIp);
     //   return NextResponse.json({ error: "Invalid IP" }, { status: 403 });
