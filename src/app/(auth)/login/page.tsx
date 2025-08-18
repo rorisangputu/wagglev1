@@ -1,12 +1,12 @@
 "use client";
-
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { signIn } from "next-auth/react";
 
 export default function SignInPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const redirectTo = searchParams.get("redirectTo") || "/";
 
   const [isPending, startTransition] = useTransition();
@@ -24,12 +24,29 @@ export default function SignInPage() {
       const res = await signIn("credentials", {
         email,
         password,
-        redirect: true,
-        redirectTo,
+        redirect: false,
+        callbackUrl: redirectTo,
       });
 
+      console.log("SignIn response:", res);
+
       if (res?.error) {
-        setError(res.error);
+        if (res.error === "CredentialsSignin") {
+          setError("Invalid email or password");
+        } else if (res.error === "EmailNotVerified") {
+          setError("Please verify your email before logging in.");
+        } else {
+          setError("Something went wrong. Try again.");
+        }
+        return; // Early return to prevent redirect on error
+      }
+
+      // Successful sign in - redirect
+      if (res?.ok) {
+        // Use the redirectTo parameter directly instead of res.url
+        router.push(redirectTo);
+        // Alternative: You could also use router.replace() to prevent back navigation
+        // router.replace(redirectTo);
       }
     });
   };

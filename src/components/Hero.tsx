@@ -19,7 +19,7 @@ export default function Hero() {
           <p className="text-base sm:text-lg text-gray-700 mb-6">
             Waggle helps busy pet parents keep tails wagging.
           </p>
-          <Link href="/book">
+          <Link href="/booking">
             <button className="px-6 py-3 bg-green-600 text-white rounded-full text-lg font-semibold hover:bg-green-700 transition">
               Book a Walk
             </button>

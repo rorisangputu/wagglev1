@@ -15,7 +15,7 @@ export const {
   session: { strategy: "jwt" },
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
@@ -27,19 +27,25 @@ export const {
           where: { email: validated.email },
         });
 
-        if (!user) throw new Error("Invalid credentials.");
+        if (!user) {
+          return null;
+        }
 
         const isValid = await bcrypt.compare(
           validated.password,
           user.password as string
         );
-        if (!isValid) throw new Error("Invalid credentials.");
+        if (!isValid) {
+          return null;
+        }
 
-        if (!user.emailVerified)
-          throw new Error("Please verify your email before logging in.");
+        if (!user.emailVerified) return null;
 
         return user;
       },
     }),
   ],
+  pages: {
+    error: "/auth/error",
+  },
 });
