@@ -40,9 +40,9 @@ export async function POST(req: Request) {
     });
 
     // Optionally, delete the verification token now that it is used
-    await db.verificationToken.delete({
-      where: { identifier: email },
-    });
+    // await db.verificationToken.delete({
+    //   where: { identifier: email },
+    // });
 
     return NextResponse.json({ message: "Email verified successfully." });
   } catch (error) {
