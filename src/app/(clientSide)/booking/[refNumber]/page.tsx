@@ -32,6 +32,8 @@ export default async function ConfirmBookingPage({
     );
   }
 
+  const amount = booking.pricePaidInCents;
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md space-y-5">
@@ -74,7 +76,7 @@ export default async function ConfirmBookingPage({
           <PayfastButton
             refNumber={refNumber}
             email={booking.user.email}
-            amount={booking.pricePaidInCents}
+            amount={amount}
           />
         </div>
 

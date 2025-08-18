@@ -4,7 +4,11 @@ import crypto from "crypto";
 
 function buildQuery(data: Record<string, string>) {
   return Object.entries(data)
-    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+    .sort(([a], [b]) => a.localeCompare(b)) // enforce alphabetical order
+    .map(
+      ([key, value]) =>
+        `${key}=${encodeURIComponent(value.trim()).replace(/%20/g, "+")}`
+    )
     .join("&");
 }
 
@@ -15,10 +19,11 @@ export async function POST(req: NextRequest) {
   if (!booking) {
     return NextResponse.json({ success: false, message: "Booking not found" });
   }
-  const userId = booking.userId;
-  const user = await db.user.findUnique({
-    where: { id: userId },
-  });
+
+  const user = await db.user.findUnique({ where: { id: booking.userId } });
+
+  // Ensure amount is in Rands
+  const amountInRands = (Number(amount) / 100).toFixed(2);
 
   const pfData: Record<string, string> = {
     merchant_id: process.env.PAYFAST_MERCHANT_ID!,
@@ -28,13 +33,13 @@ export async function POST(req: NextRequest) {
     notify_url: process.env.PAYFAST_NOTIFY_URL!,
     name_first: user?.name ?? "Customer",
     email_address: email,
-    m_payment_id: refNumber, // internal ref
-    amount: amount.toFixed(2),
+    m_payment_id: refNumber,
+    amount: amountInRands,
     item_name: `Dog walk for ${booking.dogName}`,
   };
 
-  // Optional: sign with passphrase
   const queryString = buildQuery(pfData);
+
   const signatureBase = process.env.PAYFAST_PASSPHRASE
     ? `${queryString}&passphrase=${encodeURIComponent(
         process.env.PAYFAST_PASSPHRASE
