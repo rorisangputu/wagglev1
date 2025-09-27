@@ -49,8 +49,3 @@
 
 Check out the live demo here: [Waggle Demo](https://wagglev1.vercel.app/)
 
----
-
-## License
-
-*(Include license info if applicable, e.g., MIT License)*
