@@ -7,25 +7,18 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { email, code } = verifyCodeSchema.parse(body);
 
-    // Find the verification token
-    const tokenRecord = await db.verificationToken.findUnique({
-      where: { identifier: email },
+    const tokenRecord = await db.verificationToken.findFirst({
+      where: { identifier: email, token: code },
     });
 
     if (!tokenRecord) {
       return NextResponse.json(
-        { message: "Verification code not found. Please request a new one." },
+        { message: "Verification code not found or invalid." },
         { status: 400 }
       );
     }
 
-    if (tokenRecord.token !== code) {
-      return NextResponse.json(
-        { message: "Invalid verification code." },
-        { status: 400 }
-      );
-    }
-
+    // check expiry
     if (tokenRecord.expires < new Date()) {
       return NextResponse.json(
         { message: "Verification code has expired. Please request a new one." },
@@ -33,16 +26,16 @@ export async function POST(req: Request) {
       );
     }
 
-    // Update the user's emailVerified field
+    // mark email verified
     await db.user.update({
       where: { email },
       data: { emailVerified: new Date() },
     });
 
-    // Optionally, delete the verification token now that it is used
-    // await db.verificationToken.delete({
-    //   where: { identifier: email },
-    // });
+    // delete token by ID
+    await db.verificationToken.delete({
+      where: { id: tokenRecord.id },
+    });
 
     return NextResponse.json({ message: "Email verified successfully." });
   } catch (error) {

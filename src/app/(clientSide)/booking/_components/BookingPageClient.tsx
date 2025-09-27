@@ -14,6 +14,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { bookingSchema } from "@/lib/validationSchemas";
 import { useRouter } from "next/navigation";
+import { parseTimeToDate } from "@/lib/time";
 
 const timeOptions = [
   "08:00 AM",
@@ -69,6 +70,12 @@ export default function BookingPageClient() {
     }));
   }, []);
 
+  const filteredTimeOptions = formData.date
+    ? formData.date.toDateString() === new Date().toDateString()
+      ? timeOptions.filter((time) => parseTimeToDate(time) > new Date())
+      : timeOptions
+    : timeOptions;
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -101,6 +108,30 @@ export default function BookingPageClient() {
       setFormErrors({ date: "Please select a valid date." });
       return;
     }
+
+    const now = new Date();
+
+    // Check if date is in the past
+    const selectedDate = new Date(formData.date);
+    if (selectedDate.setHours(0, 0, 0, 0) < now.setHours(0, 0, 0, 0)) {
+      setFormErrors({ date: "Selected date cannot be in the past." });
+      return;
+    }
+
+    // If the selected date is today, check the time
+    if (
+      selectedDate.toDateString() === new Date().toDateString() &&
+      formData.time
+    ) {
+      const selectedTime = parseTimeToDate(formData.time);
+
+      if (selectedTime <= new Date()) {
+        setFormErrors({ time: "Selected time must be later than now." });
+        return;
+      }
+    }
+
+    setFormErrors({});
 
     // Convert date to ISO string for consistent validation and server payload
     const preparedData = {
@@ -227,6 +258,9 @@ export default function BookingPageClient() {
                 selected={formData.date}
                 onSelect={handleDateChange}
                 className="rounded-lg border"
+                disabled={(date) =>
+                  date < new Date(new Date().setHours(0, 0, 0, 0))
+                }
               />
               {formErrors.date && (
                 <p className="text-red-500 text-sm">{formErrors.date}</p>
@@ -237,7 +271,7 @@ export default function BookingPageClient() {
                   <SelectValue placeholder="Select Preferred Time" />
                 </SelectTrigger>
                 <SelectContent>
-                  {timeOptions.map((time) => (
+                  {filteredTimeOptions.map((time) => (
                     <SelectItem key={time} value={time}>
                       {time}
                     </SelectItem>

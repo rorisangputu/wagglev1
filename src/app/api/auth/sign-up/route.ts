@@ -7,7 +7,7 @@ import { signUpSchema } from "@/lib/validationSchemas";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    //console.log(body);
+    console.log(body);
     const { name, email, phone, address, password } = signUpSchema.parse(body);
 
     if (!name || !email || !password || !phone || !address) {

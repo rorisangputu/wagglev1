@@ -72,9 +72,10 @@ model Account {
 }
 
 model VerificationToken {
-  identifier String   @unique
-  token      String   @unique
+  id         String   @id @default(cuid()) // primary key for stable deletes
+  identifier String // e.g. user email
+  token      String
   expires    DateTime
 
-  @@unique([identifier, token])
+  @@index([identifier]) // for quick lookup
 }
