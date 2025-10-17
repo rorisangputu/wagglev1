@@ -31,18 +31,33 @@ model Booking {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  name          String?
-  email         String    @unique
+  id            String     @id @default(uuid())
+  name          String
+  email         String     @unique
   password      String
-  phone         String?
-  address       String?
+  phone         String
+  streetAddress String
+  suburb        String
+  province      String
+  city          String
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
   bookings      Booking[]
-  updatedAt     DateTime  @updatedAt
+  waitlist      Waitlist[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Waitlist {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  suburb    String
+  province  String
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?
 }
 
 model Session {
