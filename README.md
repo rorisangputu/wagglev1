@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Waggle
 
-## Getting Started
+**Waggle** is a smart, on-demand platform designed to simplify pet care for busy dog owners. Users can effortlessly request a dog walk, and the system automatically matches them with an available walker in their area. The app is built with **Next.js**, **Prisma ORM** with **PostgreSQL**, and integrates **PayFast** for seamless payments, prioritizing speed, ease of use, and convenience.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **On-Demand Dog Walking:** Request a walk instantly and get matched with an available walker nearby.
+- **Real-Time Availability:** Walkers’ schedules are dynamically managed to ensure optimal matching.
+- **Secure Payments:** Integrated with **PayFast**, allowing users to make secure and seamless payments.
+- **User Profiles:** Owners and walkers can create and manage profiles, including personal details and preferences.
+- **Walk History & Tracking:** View past walks, track ongoing walks, and receive updates in real-time.
+- **Responsive Design:** Fully optimized for both desktop and mobile devices for a smooth user experience.
+- **Scalable Architecture:** Built with performance and growth in mind, supporting future feature expansion and high user traffic.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
 
-## Learn More
+- **Frontend:** Next.js, React, TypeScript  
+- **Backend:** Node.js, Next.js API routes  
+- **Database:** PostgreSQL, Prisma ORM  
+- **Payments:** PayFast integration for secure transactions  
+- **Other:** MDX for content management, server-side rendering (SSR) for SEO and fast page loads  
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Architecture & Design
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Full-Stack React/Next.js Application:** Uses API routes for backend logic and Prisma ORM for database management.  
+- **Dynamic Matching System:** Walk requests are automatically matched with available walkers in the area using real-time scheduling logic.  
+- **Secure Transactions:** Payment workflows are securely handled via PayFast sandbox in development and live environment in production.  
+- **Scalable & Maintainable:** Modular codebase allowing easy addition of features, optimized for performance and maintainability.  
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Future Enhancements
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Push notifications for walk updates  
+- Ratings and reviews for walkers  
+- Multi-pet support for owners  
+- Route optimization for walkers using mapping APIs  
+- Admin dashboard for managing users, walks, and payments  
+
+---
+
+## Demo
+
+Check out the live demo here: [Waggle Demo](https://wagglev1.vercel.app/)
+
