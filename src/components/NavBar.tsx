@@ -35,7 +35,7 @@ const NavBar = () => {
 
       {/* Main nav row */}
       <div className="flex justify-between items-center">
-        <h1 className="text-green-600 text-4xl font-bold">Waggle</h1>
+        <h1 className="text-green-600 text-4xl font-bold">The Waggle Club</h1>
 
         {/* Desktop menu */}
         <div className="hidden lg:flex space-x-2">
