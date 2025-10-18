@@ -4,7 +4,10 @@ const signUpSchema = z.object({
   name: z.string().min(2),
   email: z.email(),
   phone: z.string().min(10),
-  address: z.string().min(1),
+  streetAddress: z.string().min(1),
+  suburb: z.string().min(1),
+  province: z.string().min(1),
+  city: z.string().min(1),
   password: z.string().min(8),
   confirmPassword: z.string().min(8),
 });
@@ -32,10 +35,18 @@ const paymentSchema = z.object({
   email: z.email(),
 });
 
+const waitlistSchema = z.object({
+  email: z.email(),
+  suburb: z.string().min(2),
+  province: z.string().min(2),
+  city: z.string().min(2),
+});
+
 export {
   signUpSchema,
   loginSchema,
   bookingSchema,
   paymentSchema,
   verifyCodeSchema,
+  waitlistSchema,
 };
