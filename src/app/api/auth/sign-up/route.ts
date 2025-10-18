@@ -7,10 +7,28 @@ import { signUpSchema } from "@/lib/validationSchemas";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log(body);
-    const { name, email, phone, address, password } = signUpSchema.parse(body);
+    return console.log(body);
+    const {
+      name,
+      email,
+      phone,
+      streetAddress,
+      suburb,
+      city,
+      province,
+      password,
+    } = signUpSchema.parse(body);
 
-    if (!name || !email || !password || !phone || !address) {
+    if (
+      !name ||
+      !email ||
+      !password ||
+      !phone ||
+      !streetAddress ||
+      !suburb ||
+      !city ||
+      !province
+    ) {
       return NextResponse.json(
         { message: "All fields are required." },
         { status: 400 }
@@ -34,9 +52,12 @@ export async function POST(req: Request) {
       data: {
         name,
         email,
-        phone,
-        address,
         password: hashedPassword,
+        phone,
+        streetAddress,
+        suburb,
+        province,
+        city,
         emailVerified: null,
       },
     });

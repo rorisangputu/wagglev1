@@ -1,16 +1,19 @@
 "use client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { XCircleIcon } from "lucide-react";
+import { CircleCheckBig, XCircleIcon } from "lucide-react";
+import Link from "next/link";
 import React, { useState, useTransition } from "react";
 
 type waitlistFormProps = {
   setShowWaitlistModal: (value: boolean) => void;
 };
+<CircleCheckBig />;
 
 const WaitlistForm = ({ setShowWaitlistModal }: waitlistFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [selectedProvince, setSelectedProvince] = useState("");
+  const [success, setSuccess] = useState(false);
 
   const [waitlistForm, setWaitlistForm] = useState({
     email: "",
@@ -49,7 +52,7 @@ const WaitlistForm = ({ setShowWaitlistModal }: waitlistFormProps) => {
         });
 
         if (res.ok) {
-          setShowWaitlistModal(false);
+          setSuccess(true);
           setSelectedProvince("");
           setWaitlistForm({
             email: "",
@@ -67,6 +70,31 @@ const WaitlistForm = ({ setShowWaitlistModal }: waitlistFormProps) => {
       }
     });
   };
+  if (success) {
+    return (
+      <div className="w-full h-[40vh] flex  items-center">
+        <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-2xl shadow">
+          <div className="flex flex-col justify-center items-center text-center space-y-2">
+            <CircleCheckBig className="text-green-600" />
+            <div className="space-y-4">
+              <p className="text-green-600 text-lg">
+                You&apos;ve been added to the waitlist!
+              </p>
+              <p className=" text-neutral-500">
+                Keep an eye out for our messages. We could be in your area soon!
+              </p>
+              <Link
+                href={"/"}
+                className="inline-block text-sm bg-green-500 text-neutral-50 rounded-sm p-2 transition-all duration-200 hover:scale-110 hover:bg-green-600"
+              >
+                Go Home
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="w-full max-w-md mx-auto mt-10 p-6 bg-white rounded-2xl shadow space-y-6">
       <div className="text-center space-y-2">
