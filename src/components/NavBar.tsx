@@ -10,6 +10,7 @@ const NavBar = () => {
   const { data: session, status } = useSession();
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
+  const closeMenu = () => setMenuOpen(false);
 
   return (
     <Nav>
@@ -18,17 +19,16 @@ const NavBar = () => {
         <HeadLink href={"/contact-us"}>Contact Us</HeadLink>
 
         {status === "loading" ? null : session ? (
-          <>
-            <button
-              onClick={() => signOut({ callbackUrl: "/" })}
-              className="text-sm text-blue-500 hover:underline"
-            >
-              Logout
-            </button>
-          </>
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="text-sm text-blue-500 hover:underline"
+          >
+            Logout
+          </button>
         ) : (
           <>
             <HeadLink href={"/login"}>Login</HeadLink>
+            <HeadLink href={"/sign-up"}>Sign Up</HeadLink>
           </>
         )}
       </div>
@@ -54,36 +54,47 @@ const NavBar = () => {
         </button>
       </div>
 
+      {/* Mobile backdrop */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={closeMenu}
+        />
+      )}
+
       {/* Mobile sidebar menu */}
       {menuOpen && (
-        <div className="absolute top-0 left-0 w-2/3 h-screen bg-white shadow-md p-6 z-50 flex flex-col space-y-4 lg:hidden">
-          <div>
-            <h1 className="text-green-600 text-4xl py-6 font-bold">Waggle</h1>
-          </div>
+        <div className="fixed top-0 left-0 w-2/3 h-screen bg-white shadow-lg p-6 z-50 flex flex-col space-y-4 lg:hidden overflow-y-auto">
+          <button onClick={closeMenu} className="self-end">
+            <X className="text-black" />
+          </button>
+          <h1 className="text-green-600 text-3xl font-bold">Waggle</h1>
+
           <div className="flex flex-col space-y-3">
-            <NavLink href={"/"} onClick={toggleMenu}>
+            <NavLink href={"/"} onClick={closeMenu}>
               Home
             </NavLink>
-            <NavLink href={"/book"} onClick={toggleMenu}>
+            <NavLink href={"/book"} onClick={closeMenu}>
               Book A Walk
             </NavLink>
             {session && (
-              <NavLink href={"/walks"} onClick={toggleMenu}>
+              <NavLink href={"/walks"} onClick={closeMenu}>
                 My Walks
               </NavLink>
             )}
-            <NavLink href={"/contact-us"} onClick={toggleMenu}>
+            <NavLink href={"/contact-us"} onClick={closeMenu}>
               Contact Us
             </NavLink>
+
             {status === "loading" ? null : session ? (
               <>
-                <NavLink href={"/account"} onClick={toggleMenu}>
+                <NavLink href={"/account"} onClick={closeMenu}>
                   Account
                 </NavLink>
                 <button
                   onClick={() => {
                     signOut({ callbackUrl: "/" });
-                    toggleMenu();
+                    closeMenu();
                   }}
                   className="text-left text-sm text-blue-500 hover:underline"
                 >
@@ -92,10 +103,10 @@ const NavBar = () => {
               </>
             ) : (
               <>
-                <NavLink href={"/login"} onClick={toggleMenu}>
+                <NavLink href={"/login"} onClick={closeMenu}>
                   Login
                 </NavLink>
-                <NavLink href={"/sign-up"} onClick={toggleMenu}>
+                <NavLink href={"/sign-up"} onClick={closeMenu}>
                   Sign Up
                 </NavLink>
               </>
