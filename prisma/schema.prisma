@@ -55,6 +55,7 @@ model Waitlist {
   email     String   @unique
   suburb    String
   province  String
+  city      String
   createdAt DateTime @default(now())
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String?
