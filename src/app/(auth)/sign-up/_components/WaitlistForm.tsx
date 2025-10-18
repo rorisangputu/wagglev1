@@ -30,6 +30,11 @@ const WaitlistForm = ({ setShowWaitlistModal }: waitlistFormProps) => {
     "North West",
     "Western Cape",
   ];
+  const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const province = e.target.value;
+    setSelectedProvince(province);
+    setWaitlistForm({ ...waitlistForm, province });
+  };
 
   const handleWaitlistSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -115,7 +120,7 @@ const WaitlistForm = ({ setShowWaitlistModal }: waitlistFormProps) => {
             placeholder="Your City"
             value={waitlistForm.city}
             onChange={(e) =>
-              setWaitlistForm({ ...waitlistForm, province: e.target.value })
+              setWaitlistForm({ ...waitlistForm, city: e.target.value })
             }
             required
             className="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -128,7 +133,7 @@ const WaitlistForm = ({ setShowWaitlistModal }: waitlistFormProps) => {
           <select
             id="province"
             value={selectedProvince}
-            onChange={(e) => setSelectedProvince(e.target.value)}
+            onChange={handleProvinceChange}
             required
             className="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
           >
