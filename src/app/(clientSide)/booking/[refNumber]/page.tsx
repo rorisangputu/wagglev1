@@ -16,7 +16,7 @@ export default async function ConfirmBookingPage({
 
   const { refNumber } = await params;
   if (!session?.user) {
-    redirect("/sign-in"); // or your custom sign-in route
+    redirect("/user/login"); // or your custom sign-in route
   }
 
   const booking = await db.booking.findUnique({
