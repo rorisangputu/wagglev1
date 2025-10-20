@@ -28,12 +28,13 @@ model Booking {
   date             DateTime
   time             String
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Walk             Walk[]
 }
 
 model User {
-  id            String     @id @default(uuid())
+  id            String    @id @default(uuid())
   name          String
-  email         String     @unique
+  email         String    @unique
   password      String
   phone         String
   streetAddress String
@@ -45,9 +46,10 @@ model User {
   accounts      Account[]
   sessions      Session[]
   bookings      Booking[]
-  waitlist      Waitlist[]
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  Walks         Walk[]
+  Dogs          Dog[]
 }
 
 model Waitlist {
@@ -57,8 +59,124 @@ model Waitlist {
   province  String
   city      String
   createdAt DateTime @default(now())
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String?
+}
+
+//Walker Models
+model Walker {
+  id       String @id @default(cuid())
+  name     String
+  lastname String
+  email    String @unique
+  address  String
+  phone    String
+  password String
+  idNumber String
+  idCopy   String
+
+  verificationToken String
+  verified          Boolean
+
+  walkerId     String       @unique //short unique walker id for sign in
+  walkerImage  String?
+  rating       Int?
+  totalWalks   Int?
+  availability String?
+  status       WalkerStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Walk      Walk[]
+
+  @@index([email])
+  @@index([walkerId])
+  @@index([status])
+}
+
+model Walk {
+  id        String     @id @default(cuid())
+  walkNo    String     @unique
+  userId    String
+  walkerId  String
+  dogId     String
+  bookingId String     @unique
+  status    WalkStatus @default(PENDING)
+
+  type          WalkType
+  price         Decimal  @db.Decimal(10, 2)
+  startTime     DateTime
+  endTime       DateTime
+  duration      Int?
+  pickupAddress String
+  notes         String?
+
+  rating Int?
+  review String?
+
+  promo Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  walker  Walker  @relation(fields: [walkerId], references: [id])
+  dog     Dog     @relation(fields: [dogId], references: [id])
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  @@index([userId])
+  @@index([walkerId])
+  @@index([status])
+  @@index([startTime])
+}
+
+model Dog {
+  id      String  @id @default(cuid())
+  name    String
+  age     Int?
+  breed   String
+  size    DogSize
+  image   String?
+  ownerId String
+
+  owner User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  Walks Walk[]
+}
+
+enum DogSize {
+  SMALL
+  MEDIUM
+  LARGE
+  EXTRA_LARGE
+}
+
+enum WalkerStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum WalkStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum WalkType {
+  SHORT
+  MEDIUM
+  LONG
+  CUSTOM
+}
+
+enum BookingStatus {
+  PENDING // Booking created, payment pending
+  CONFIRMED // Payment received, awaiting walker assignment
+  WALKER_ASSIGNED // Walker assigned, awaiting walk
+  IN_PROGRESS // Walk is happening
+  COMPLETED // Walk completed
+  CANCELLED // Booking cancelled
 }
 
 model Session {
