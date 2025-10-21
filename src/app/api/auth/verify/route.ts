@@ -1,43 +1,51 @@
-import { NextResponse } from "next/server";
-import db from "@/db/db";
+import { NextRequest, NextResponse } from "next/server";
 import { verifyCodeSchema } from "@/lib/validationSchemas";
+import { resendVerificationCode, verifyUser } from "@/lib/user/account/actions";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, code } = verifyCodeSchema.parse(body);
+    const { email, code, action } = verifyCodeSchema.parse(body);
 
-    const tokenRecord = await db.verificationToken.findFirst({
-      where: { identifier: email, token: code },
-    });
+    if (!email) {
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
 
-    if (!tokenRecord) {
+    //Handle resend verification code action
+    if (action == "resend") {
+      const result = await resendVerificationCode(email);
+
+      if (!result.success) {
+        return NextResponse.json({ error: result.error }, { status: 400 });
+      }
+
       return NextResponse.json(
-        { message: "Verification code not found or invalid." },
+        { success: "Verification code resent" },
+        { status: 200 }
+      );
+    }
+
+    //Handle Verification Code
+    if (!code) {
+      return NextResponse.json(
+        { error: "Verification code is required" },
         { status: 400 }
       );
     }
 
-    // check expiry
-    if (tokenRecord.expires < new Date()) {
-      return NextResponse.json(
-        { message: "Verification code has expired. Please request a new one." },
-        { status: 400 }
-      );
+    const result = await verifyUser(email, code);
+
+    if (!result.success) {
+      return NextResponse.json({ error: result.error }, { status: 400 });
     }
 
-    // mark email verified
-    await db.user.update({
-      where: { email },
-      data: { emailVerified: new Date() },
-    });
-
-    // delete token by ID
-    await db.verificationToken.delete({
-      where: { id: tokenRecord.id },
-    });
-
-    return NextResponse.json({ message: "Email verified successfully." });
+    return NextResponse.json(
+      {
+        success: "User account verified successfully. You can now sign in.",
+        redirectTo: "/login",
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error(error);
     return NextResponse.json(

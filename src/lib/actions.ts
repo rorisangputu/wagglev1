@@ -6,7 +6,8 @@ type CurrentUser = {
   id: string;
   email: string;
   name: string | null;
-  address: string | null;
+  suburb: string | null;
+  city: string | null;
 };
 
 export async function getCurrentUser(): Promise<CurrentUser> {
@@ -17,7 +18,7 @@ export async function getCurrentUser(): Promise<CurrentUser> {
 
   const user = await db.user.findUnique({
     where: { email: userSession.user.email },
-    select: { id: true, email: true, name: true, address: true },
+    select: { id: true, email: true, name: true, suburb: true, city: true },
   });
 
   if (!user) {

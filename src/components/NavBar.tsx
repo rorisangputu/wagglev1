@@ -27,8 +27,8 @@ const NavBar = () => {
           </button>
         ) : (
           <>
-            <HeadLink href={"/login"}>Login</HeadLink>
-            <HeadLink href={"/sign-up"}>Sign Up</HeadLink>
+            <HeadLink href={"/user/login"}>Login</HeadLink>
+            <HeadLink href={"/user/sign-up"}>Sign Up</HeadLink>
           </>
         )}
       </div>
@@ -103,10 +103,10 @@ const NavBar = () => {
               </>
             ) : (
               <>
-                <NavLink href={"/login"} onClick={closeMenu}>
+                <NavLink href={"/user/login"} onClick={closeMenu}>
                   Login
                 </NavLink>
-                <NavLink href={"/sign-up"} onClick={closeMenu}>
+                <NavLink href={"/user/sign-up"} onClick={closeMenu}>
                   Sign Up
                 </NavLink>
               </>

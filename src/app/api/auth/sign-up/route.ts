@@ -1,33 +1,23 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import db from "@/db/db";
-import { addMinutes } from "date-fns";
 import { signUpSchema } from "@/lib/validationSchemas";
+import { createUser } from "@/lib/user/account/actions";
+import { getUserByEmail } from "@/lib/user/actions";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     console.log(body);
-    const {
-      name,
-      email,
-      phone,
-      streetAddress,
-      suburb,
-      city,
-      province,
-      password,
-    } = signUpSchema.parse(body);
+    const user = signUpSchema.parse(body);
 
     if (
-      !name ||
-      !email ||
-      !password ||
-      !phone ||
-      !streetAddress ||
-      !suburb ||
-      !city ||
-      !province
+      !user.name ||
+      !user.email ||
+      !user.password ||
+      !user.phone ||
+      !user.streetAddress ||
+      !user.suburb ||
+      !user.city ||
+      !user.province
     ) {
       return NextResponse.json(
         { message: "All fields are required." },
@@ -35,9 +25,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const existingUser = await db.user.findUnique({
-      where: { email },
-    });
+    const existingUser = await getUserByEmail(user.email);
 
     if (existingUser) {
       return NextResponse.json(
@@ -46,36 +34,24 @@ export async function POST(req: Request) {
       );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    //Create User
+    const res = await createUser(user);
 
-    const user = await db.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        phone,
-        streetAddress,
-        suburb,
-        province,
-        city,
-        emailVerified: null,
+    if (!res.ok)
+      return NextResponse.json(
+        {
+          message: "User could not be created. Please try again",
+        },
+        { status: 400 }
+      );
+
+    return NextResponse.json(
+      {
+        message: "User created successfully.",
+        redirectTo: `/user/verify?email=${encodeURIComponent(user.email)}`,
       },
-    });
-
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-
-    await db.verificationToken.create({
-      data: {
-        identifier: user.email,
-        token: code,
-        expires: addMinutes(new Date(), 15),
-      },
-    });
-
-    // Replace this with your actual email service (Resend, Nodemailer, etc.)
-    console.log(`Verification code for ${user.email}: ${code}`);
-
-    return NextResponse.json({ message: "User created successfully." });
+      { status: 201 }
+    );
   } catch (error) {
     console.error(error);
     return NextResponse.json(
