@@ -32,7 +32,7 @@ export default function VerifyPage() {
         });
 
         if (res.ok) {
-          router.push("/login?verified=true");
+          router.push("/user/login?verified=true");
         } else {
           const data = await res.json();
           setError(data.message || "Verification failed.");

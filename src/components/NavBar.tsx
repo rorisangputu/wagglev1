@@ -1,121 +1,77 @@
-"use client";
+import { auth, signOut } from "@/lib/auth";
+import Link from "next/link";
+import MobileMenu from "./Nav/MobileMenu";
 
-import React, { useState } from "react";
-import { HeadLink, Nav, NavLink } from "./Nav";
-import { AlignJustify, X } from "lucide-react";
-import { useSession, signOut } from "next-auth/react";
-
-const NavBar = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const { data: session, status } = useSession();
-
-  const toggleMenu = () => setMenuOpen(!menuOpen);
-  const closeMenu = () => setMenuOpen(false);
-
-  return (
-    <Nav>
-      {/* Top right links */}
-      <div className="flex justify-end space-x-5">
-        <HeadLink href={"/contact-us"}>Contact Us</HeadLink>
-
-        {status === "loading" ? null : session ? (
-          <button
-            onClick={() => signOut({ callbackUrl: "/" })}
-            className="text-sm text-blue-500 hover:underline"
-          >
-            Logout
-          </button>
-        ) : (
-          <>
-            <HeadLink href={"/user/login"}>Login</HeadLink>
-            <HeadLink href={"/user/sign-up"}>Sign Up</HeadLink>
-          </>
-        )}
-      </div>
-
-      {/* Main nav row */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-green-600 text-4xl font-bold">The Waggle Club</h1>
-
-        {/* Desktop menu */}
-        <div className="hidden lg:flex space-x-2">
-          <NavLink href={"/"}>Home</NavLink>
-          <NavLink href={"/book"}>Book A Walk</NavLink>
-          {session && <NavLink href={"/walks"}>My Walks</NavLink>}
-        </div>
-
-        {/* Mobile menu button */}
-        <button onClick={toggleMenu} className="lg:hidden">
-          {menuOpen ? (
-            <X className="text-black" />
-          ) : (
-            <AlignJustify className="text-black" />
-          )}
-        </button>
-      </div>
-
-      {/* Mobile backdrop */}
-      {menuOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={closeMenu}
-        />
-      )}
-
-      {/* Mobile sidebar menu */}
-      {menuOpen && (
-        <div className="fixed top-0 left-0 w-2/3 h-screen bg-white shadow-lg p-6 z-50 flex flex-col space-y-4 lg:hidden overflow-y-auto">
-          <button onClick={closeMenu} className="self-end">
-            <X className="text-black" />
-          </button>
-          <h1 className="text-green-600 text-3xl font-bold">Waggle</h1>
-
-          <div className="flex flex-col space-y-3">
-            <NavLink href={"/"} onClick={closeMenu}>
-              Home
-            </NavLink>
-            <NavLink href={"/book"} onClick={closeMenu}>
-              Book A Walk
-            </NavLink>
-            {session && (
-              <NavLink href={"/walks"} onClick={closeMenu}>
-                My Walks
-              </NavLink>
-            )}
-            <NavLink href={"/contact-us"} onClick={closeMenu}>
-              Contact Us
-            </NavLink>
-
-            {status === "loading" ? null : session ? (
-              <>
-                <NavLink href={"/account"} onClick={closeMenu}>
-                  Account
-                </NavLink>
-                <button
-                  onClick={() => {
-                    signOut({ callbackUrl: "/" });
-                    closeMenu();
-                  }}
-                  className="text-left text-sm text-blue-500 hover:underline"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <NavLink href={"/user/login"} onClick={closeMenu}>
-                  Login
-                </NavLink>
-                <NavLink href={"/user/sign-up"} onClick={closeMenu}>
-                  Sign Up
-                </NavLink>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-    </Nav>
-  );
+type NavUser = {
+  name: string;
+  email: string;
+  id: string;
+  role?: string;
 };
 
-export default NavBar;
+export default async function NavBar() {
+  const session = await auth();
+  const user = session?.user as NavUser | undefined;
+
+  async function handleSignOut() {
+    "use server";
+    await signOut({ redirectTo: "/" });
+  }
+
+  return (
+    <nav className="w-full border-b bg-white">
+      <div className="w-[90%] xl:w-[80%] mx-auto py-4">
+        {/* Top row - Contact and Auth links */}
+        <div className="hidden lg:flex justify-end space-x-5 text-sm mb-4">
+          <Link href="/contact-us" className="hover:underline">
+            Contact Us
+          </Link>
+          {user ? (
+            <form action={handleSignOut} className="inline">
+              <button type="submit" className="text-blue-500 hover:underline">
+                Logout
+              </button>
+            </form>
+          ) : (
+            <>
+              <Link href="/user/login" className="hover:underline">
+                Login
+              </Link>
+              <Link href="/user/sign-up" className="hover:underline">
+                Sign Up
+              </Link>
+            </>
+          )}
+        </div>
+
+        {/* Main nav row */}
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/">
+            <h1 className="text-green-600 text-3xl lg:text-4xl font-bold">
+              The Waggle Club
+            </h1>
+          </Link>
+
+          {/* Desktop menu */}
+          <div className="hidden lg:flex items-center space-x-6">
+            <Link href="/" className="hover:text-green-600 transition">
+              Home
+            </Link>
+            <Link href="/booking" className="hover:text-green-600 transition">
+              Book A Walk
+            </Link>
+            {user && (
+              <Link href="/walks" className="hover:text-green-600 transition">
+                My Walks
+              </Link>
+            )}
+          </div>
+
+          {/* Mobile menu */}
+          <MobileMenu user={user} onSignOut={handleSignOut} />
+        </div>
+      </div>
+    </nav>
+  );
+}

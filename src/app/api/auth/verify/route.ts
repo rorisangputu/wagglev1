@@ -1,29 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyCodeSchema } from "@/lib/validationSchemas";
-import { resendVerificationCode, verifyUser } from "@/lib/user/account/actions";
+import { verifyUser } from "@/lib/user/account/actions";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, code, action } = verifyCodeSchema.parse(body);
+
+    const { email, code } = verifyCodeSchema.parse(body);
+    
 
     if (!email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
     //Handle resend verification code action
-    if (action == "resend") {
-      const result = await resendVerificationCode(email);
+    // if (action == "resend") {
+    //   const result = await resendVerificationCode(email);
 
-      if (!result.success) {
-        return NextResponse.json({ error: result.error }, { status: 400 });
-      }
+    //   if (!result.success) {
+    //     return NextResponse.json({ error: result.error }, { status: 400 });
+    //   }
 
-      return NextResponse.json(
-        { success: "Verification code resent" },
-        { status: 200 }
-      );
-    }
+    //   return NextResponse.json(
+    //     { success: "Verification code resent" },
+    //     { status: 200 }
+    //   );
+    // }
 
     //Handle Verification Code
     if (!code) {

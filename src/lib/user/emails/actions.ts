@@ -1,5 +1,6 @@
 import { createTransport } from "nodemailer";
 
+//Real Intergration
 const transport = createTransport({
   host: process.env.MAILTRAP_HOST,
   port: Number(process.env.MAILTRAP_PORT),
@@ -78,5 +79,3 @@ export async function sendAccountVerificationEmail(
     return { success: false, error: "Failed to send verification email" };
   }
 }
-
-

@@ -20,7 +20,6 @@ const loginSchema = z.object({
 const verifyCodeSchema = z.object({
   email: z.email(),
   code: z.string().length(6),
-  action: z.string().min(2),
 });
 
 const bookingSchema = z.object({

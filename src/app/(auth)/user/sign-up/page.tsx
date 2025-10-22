@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { XCircleIcon } from "lucide-react";
@@ -9,7 +8,6 @@ import { isSuburbServiced, getServicedSuburbs } from "@/lib/serviceSuburbs";
 import WaitlistForm from "./_components/WaitlistForm";
 
 export default function SignUpPage() {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [suburbError, setSuburbError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -80,9 +78,13 @@ export default function SignUpPage() {
           body: JSON.stringify(data),
           headers: { "Content-Type": "application/json" },
         });
-
+        console.log("RESULT STATUSS:", res.status);
         if (res.ok) {
-          router.push("/booking");
+          const responseData = await res.json();
+          // Use window.location.href to bypass any middleware/routing issues
+          window.location.href =
+            responseData.redirectTo ||
+            `/user/verify?email=${encodeURIComponent(data.email as string)}`;
         } else {
           const errorData = await res.json();
           setError(errorData.message || "Something went wrong");

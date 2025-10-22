@@ -3,6 +3,7 @@ import { generateVerificationCode, getUserByEmail } from "../actions";
 import db from "@/db/db";
 import { sendAccountVerificationEmail } from "../emails/actions";
 import { NextResponse } from "next/server";
+//import { sendTestVerificationEmail } from "../emails/Test";
 
 export async function createUser(data: {
   name: string;
@@ -41,27 +42,33 @@ export async function createUser(data: {
       );
     }
 
-    const emailResult = await sendAccountVerificationEmail(
-      data.email,
-      data.name,
-      verificationCode,
-      verificationCodeExpires
-    );
+    // const emailResult = await sendAccountVerificationEmail(
+    //   data.email,
+    //   data.name,
+    //   verificationCode,
+    //   verificationCodeExpires
+    // );
+    // const emailResult = await sendTestVerificationEmail(
+    //   data.email,
+    //   data.name,
+    //   verificationCode,
+    //   verificationCodeExpires
+    // );
 
-    if (!emailResult.success) {
-      // Log error but don't fail user creation
-      console.error(
-        "⚠️ User created but email failed to send:",
-        emailResult.error
-      );
-    }
+    // if (emailResult.error) {
+    //   // Log error but don't fail user creation
+    //   console.error(
+    //     "⚠️ User created but email failed to send:",
+    //     emailResult.error
+    //   );
+    // }
 
     // Console log for testing/backup
     console.log("🔐 USER VERIFICATION CODE:");
     console.log(`📧 Email: ${data.email}`);
     console.log(`🔢 Code: ${verificationCode}`);
     console.log(`⏰ Expires: ${verificationCodeExpires}`);
-    console.log(`📬 Email sent: ${emailResult.success ? "✅" : "❌"}`);
+    //console.log(`📬 Email sent: ${emailResult.success ? "✅" : "❌"}`);
     console.log("=".repeat(50));
 
     return NextResponse.json(
