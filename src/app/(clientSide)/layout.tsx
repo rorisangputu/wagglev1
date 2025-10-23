@@ -10,10 +10,10 @@ export default function ClientLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <NavBar />
       <div className="w-[90%] xl:w-[70%] mx-auto my-6 flex-1">{children}</div>
       <Footer />
-    </>
+    </div>
   );
 }

@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react";
 export default function Hero() {
   return (
     <section className="w-full bg-gradient-to-br from-green-50 via-white to-emerald-50 py-20 px-6 overflow-hidden">
-      <div className="max-w-7xl mx-auto">
+      <div className=" mx-auto">
         {/* Main Content */}
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Text Section */}

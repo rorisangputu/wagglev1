@@ -1,6 +1,9 @@
-import { auth, signOut } from "@/lib/auth";
+import { signOut } from "@/lib/auth";
 import Link from "next/link";
 import MobileMenu from "./Nav/MobileMenu";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+
+import { getCurrentUser } from "@/lib/actions";
 
 type NavUser = {
   name: string;
@@ -10,8 +13,7 @@ type NavUser = {
 };
 
 export default async function NavBar() {
-  const session = await auth();
-  const user = session?.user as NavUser | undefined;
+  const user = (await getCurrentUser()) as NavUser;
 
   async function handleSignOut() {
     "use server";
@@ -20,29 +22,18 @@ export default async function NavBar() {
 
   return (
     <nav className="w-full border-b bg-white">
-      <div className="w-[90%] xl:w-[80%] mx-auto py-4">
+      <div className="w-[90%] xl:w-[70%] mx-auto py-5">
         {/* Top row - Contact and Auth links */}
-        <div className="hidden lg:flex justify-end space-x-5 text-sm mb-4">
-          <Link href="/contact-us" className="hover:underline">
-            Contact Us
-          </Link>
-          {user ? (
-            <form action={handleSignOut} className="inline">
-              <button type="submit" className="text-blue-500 hover:underline">
-                Logout
-              </button>
-            </form>
-          ) : (
-            <>
-              <Link href="/user/login" className="hover:underline">
-                Login
-              </Link>
-              <Link href="/user/sign-up" className="hover:underline">
-                Sign Up
-              </Link>
-            </>
-          )}
-        </div>
+        {!user && (
+          <div className="hidden lg:flex justify-end space-x-5 text-sm mb-4">
+            <Link href="/user/login" className="hover:underline">
+              Login
+            </Link>
+            <Link href="/user/sign-up" className="hover:underline">
+              Sign Up
+            </Link>
+          </div>
+        )}
 
         {/* Main nav row */}
         <div className="flex items-center justify-between">
@@ -62,8 +53,17 @@ export default async function NavBar() {
               Book A Walk
             </Link>
             {user && (
-              <Link href="/walks" className="hover:text-green-600 transition">
-                My Walks
+              <Link
+                href={`/${user.id}/profile`}
+                className="hover:text-green-600 transition"
+              >
+                <Avatar className="rounded-lg bg-neutral-100 hover:bg-neutral-200 p-2">
+                  <AvatarImage
+                    src="https://res.cloudinary.com/dxsmixio5/image/upload/v1761158726/icons8-user-50_wlpsdf.png"
+                    alt="@evilrabbit"
+                  />
+                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                </Avatar>
               </Link>
             )}
           </div>

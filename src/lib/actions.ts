@@ -10,10 +10,10 @@ type CurrentUser = {
   city: string | null;
 };
 
-export async function getCurrentUser(): Promise<CurrentUser> {
+export async function getCurrentUser(): Promise<CurrentUser | null> {
   const userSession = await auth();
   if (!userSession?.user?.email) {
-    throw new Error("Not authenticated");
+    return null
   }
 
   const user = await db.user.findUnique({

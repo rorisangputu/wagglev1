@@ -54,8 +54,8 @@ export default function ServicesCarousel() {
   ];
 
   return (
-    <section className="w-full px-6 py-20 bg-white">
-      <div className="max-w-6xl mx-auto">
+    <section className="w-full  py-20 bg-white">
+      <div className="mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4">
