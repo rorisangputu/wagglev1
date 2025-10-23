@@ -2,21 +2,10 @@
 import React from "react";
 import { Mail, Phone, MapPin, Edit, User } from "lucide-react";
 import { useRouter } from "next/navigation";
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-  phone: string;
-  streetAddress: string;
-  suburb: string;
-  province: string;
-  city: string;
-};
+import { headerUser } from "@/lib/types/UserTypes";
 
 type HeaderProps = {
-  user: User;
+  user: headerUser;
 };
 
 const ProfileHeader = ({ user }: HeaderProps) => {

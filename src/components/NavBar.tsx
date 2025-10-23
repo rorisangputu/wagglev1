@@ -54,7 +54,7 @@ export default async function NavBar() {
             </Link>
             {user && (
               <Link
-                href={`/${user.id}/profile`}
+                href={`/user/profile`}
                 className="hover:text-green-600 transition"
               >
                 <Avatar className="rounded-lg bg-neutral-100 hover:bg-neutral-200 p-2">
